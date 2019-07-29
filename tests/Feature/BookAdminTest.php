@@ -5,6 +5,7 @@ namespace Tests\Feature;
 
 
 use App\Book;
+use App\Author;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -19,101 +20,93 @@ class BookAdminTest extends TestCase
     /** @test  */
     public function test_add_book(){
 
-        $response = $this->post('/books', [
-            "author" => "Kevin",
-            "title" => "lo que el viento se llevo",
-            "Editorial" => "lunaRoja"
-        ]);
+        $this->withoutExceptionHandling();
+        $response = $this->post('/books', $this->data());
 
-        $response->assertOk();
         $this->assertCount(1, Book::all());
+        $this->assertEquals("lunaRoja", Book::first()->editorial);
+        $response->assertOk();
+        Author::truncate();
+        Book::truncate();
     }
 
     /** @test */
-    public function test_add_Book_title_empty()
+    public function test_add1_Book_title_empty()
     {
-
-        $response = $this->post('/books', [
-            "author" => "",
-            "title" => "",
-            "Editorial" => "lunaRoja"
-        ]);
+        $response = $this->post('/books', array_merge($this->data(), ['title'=>'']));
         $this->assertEmpty( Book::all());
         $response->assertSessionHasErrors("title");
     }
  
 
         /** @test */
-        public function test_update()
+        public function test_update_book_create_author()
         {    
-            $this->post('/books', [
-                "author" => "Julio",
-                "title" => "10 millas de viajes sobre el agua",
-                "Editorial" => "lunaRoja"
-            ]);
-
-            $book = Book::first();
-            
+            $this->post('/books', $this->data());
+            $book = Book::first();            
             $response = $this->patch('/books/'. $book->id, [
                 "title" => "casi 10 millas",
-                "author" => "mario",
+                "author_id" => "mario",
             ]);
-            
+
             $this->assertEquals("casi 10 millas", Book::first()->title );
-            $this->assertEquals("mario", Book::first()->author );
-           
+            $this->assertEquals( 2,    Book::first()->author_id );
+            $this->assertEquals("mario", Author::find(2)->nombre);
+            Author::truncate();
+            Book::truncate();
         }
+
+
+
      
        /** @test */
-       public function test_update_all_Empty()
+       public function test_update1_all_Empty()
        {    
-           $this->post('/books', [
-               "author" => "Julio",
-               "title" => "10 millas de viajes sobre el agua",
-               "Editorial" => "lunaRoja"
-           ]);
-
+           $this->post('/books', $this->data());
            $book = Book::first();
-           
            $response = $this->patch('/books/'. $book->id, [
                "title" => "   ",
-               "author"=> " "
-
+               "author_id"=> " "
            ]);
-
            $response->assertSessionHasErrors("title");
-           $response->assertSessionHasErrors("author");
-          
+           $response->assertSessionHasErrors("author_id");
        }
 
         /** @test */
         public function test_destroy()
         {    
             $this->withoutExceptionHandling();
-            $this->post('/books', [
-                "author" => "Julio",
-                "title" => "10 millas de viajes sobre el agua",
-                "Editorial" => "lunaRoja"
-            ]);
-
+            $this->post('/books', $this->data());
             $book = Book::first();
             $this->assertCount(1, Book::all());
-
-            // Muy buena alternativa para no volver a agregar nada  a la base de datos.
-            // $this->test_add_book();
-            // $book= Book::first();
-            
             $response = $this->delete('/books/'. $book->id);
-
             $this->assertCount(0, Book::all());
+
             // in case redirection is needed... 
             $response->assertRedirect('/');
         }
 
+        
 
+        /** @test */
+        public function test_booking_add_author()
+        {    
+            $this->withoutExceptionHandling();
+            $this->post("/books/", $this->data());
+            $author= Author::first();
+            $book = Book::first();
+            $this->assertCount(1, Author::all());
+            $this->assertEquals($author->id, $book->author_id);
+        }
 
-
-
+        
+        private function data(){
+            return [
+                "title" => "10 millas de viajes sobre el agua",            
+                "author_id" => "Julio Rojas",
+                "editorial" => "lunaRoja"
+            ];
+        }
 
      
 }

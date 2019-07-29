@@ -9,7 +9,8 @@ class BooksController extends Controller
     //
     public function store()
     {
-        Book::create($this->validateRequest());
+        $this->validateRequest();
+        Book::create(request()->all());
     }
 
     public function update(Book $book){
@@ -30,7 +31,7 @@ class BooksController extends Controller
     protected function validateRequest(){
         return request()->validate([
             'title'=>"required",
-            'author'=>"required",
+            'author_id'=>"required",
         ]);
 
     }

@@ -20,3 +20,8 @@ Route::post('/books', 'BooksController@store' );
 Route::patch('/books/{book}', 'BooksController@update' );
 
 Route::delete('/books/{book}', 'BooksController@destroy');
+
+//Author
+
+Route::post('/author', 'AuthorController@store' );
+Route::patch('/author/{author}',  'AuthorController@update' );
