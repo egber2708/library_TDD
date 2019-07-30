@@ -25,3 +25,12 @@ Route::delete('/books/{book}', 'BooksController@destroy');
 
 Route::post('/author', 'AuthorController@store' );
 Route::patch('/author/{author}',  'AuthorController@update' );
+
+
+//Reservation
+Route::post('/reservation_out/{book}', 'ReservationController@store' )->middleware('auth');
+
+Route::post('/reservation_in/{book}', 'ReservationController@update' );
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');

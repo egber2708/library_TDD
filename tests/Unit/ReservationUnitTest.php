@@ -10,7 +10,7 @@ use App\Book;
 use App\Reservation;
 use Mockery\Exception;
 
-class ReservationAdminTest extends TestCase
+class ReservationUnitTest extends TestCase
 {
     /**
      * A basic unit test example.
