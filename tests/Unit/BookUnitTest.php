@@ -43,12 +43,11 @@ class BookUnitTest extends TestCase
             "author_id" => "Julio Rojas",
             "editorial" => "lunaRoja"
         ]);
-        $author = Author::all();
-        //dd($author);
-        
+
         $this->assertCount(1, Author::all());           
         $this->assertEquals(1, Book::first()->author_id);
-
+        Author::truncate();
+        Book::truncate();
     }
 
 
