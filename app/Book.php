@@ -21,11 +21,9 @@ class Book extends Model
         $reservation = Reservation::where('book_id', $this->id)->where('check_in' , null)->first();
 
         if ( empty($reservation)){
-            Reservation::create([
-                'book_id'=> $this->id,
+           $this->reservations()->create([
                 'user_id'=> $user->id,
                 'check_out' => now(),
-                'check_in' => null,
                 'observation' => null,
             ]);
         }else{
@@ -36,13 +34,18 @@ class Book extends Model
     }
 
     public function checkIn(){
-        $reservation = Reservation::where('book_id', $this->id)->where('check_in' , null)->first();
+        $reservation = $this->reservations()->where('book_id', $this->id)->where('check_in' , null)->first();
         if ( !empty($reservation)){
             $reservation->update(["check_in"=>now()]);
         }else{
            throw new \Exception();
         }
-
     }
+
+    public function reservations(){
+        return $this->hasMany(Reservation::class);
+    }
+
+
 
 }
